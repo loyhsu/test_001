@@ -1,0 +1,15 @@
+{
+  "name": "expression-workshop-cleanup-expired",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "test": "node --test index.test.js config.test.js"
+  },
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  }
+}

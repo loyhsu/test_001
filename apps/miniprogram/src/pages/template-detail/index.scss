@@ -1,0 +1,157 @@
+.detail-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-topbar {
+  display: flex;
+  align-items: center;
+  height: 74rpx;
+  margin-bottom: 18rpx;
+}
+
+.page-topbar__back,
+.page-topbar__spacer {
+  width: 70rpx;
+}
+
+.page-topbar__back {
+  color: #233650;
+  font-size: 22rpx;
+  font-weight: 550;
+  line-height: 1;
+}
+
+.page-topbar__title {
+  flex: 1;
+  color: #1b2941;
+  font-size: 28rpx;
+  font-weight: 650;
+  text-align: center;
+}
+
+.detail-hero {
+  position: relative;
+  height: 610rpx;
+  overflow: hidden;
+  border-radius: 36rpx;
+  background: #dceaff;
+}
+
+.detail-hero__image {
+  width: 100%;
+  height: 100%;
+}
+
+.detail-hero__badge {
+  position: absolute;
+  top: 22rpx;
+  left: 22rpx;
+  padding: 11rpx 18rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.7);
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.9);
+  color: #3766ae;
+  font-size: 20rpx;
+}
+
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 27rpx 2rpx 24rpx;
+}
+
+.detail-title-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.detail-title {
+  color: #1c2a42;
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.detail-summary {
+  color: #7a879c;
+  font-size: 23rpx;
+}
+
+.detail-category {
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: #eaf2ff;
+  color: #3475ea;
+  font-size: 20rpx;
+}
+
+.detail-card {
+  padding: 22rpx 24rpx;
+  border: 1rpx solid #edf1f7;
+  border-radius: 24rpx;
+  background: #fff;
+}
+
+.detail-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  color: #26364f;
+  font-size: 23rpx;
+  font-weight: 650;
+}
+
+.detail-card__dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #3277f6;
+  box-shadow: 0 0 0 7rpx #eaf2ff;
+}
+
+.detail-card__copy {
+  display: block;
+  margin-top: 15rpx;
+  color: #71809a;
+  font-size: 22rpx;
+  line-height: 1.6;
+}
+
+.detail-card--blue {
+  margin-top: 16rpx;
+  border: 0;
+  background: #eef5ff;
+}
+
+.detail-blue-title,
+.detail-blue-copy {
+  display: block;
+}
+
+.detail-blue-title {
+  color: #315eaa;
+  font-size: 23rpx;
+  font-weight: 650;
+}
+
+.detail-blue-copy {
+  margin-top: 8rpx;
+  color: #7086a8;
+  font-size: 20rpx;
+}
+
+.detail-action {
+  margin-top: auto;
+  padding-top: 24rpx;
+}
+
+.detail-action__note {
+  display: block;
+  margin-top: 14rpx;
+  color: #8a97aa;
+  font-size: 20rpx;
+  text-align: center;
+}

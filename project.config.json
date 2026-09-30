@@ -1,0 +1,15 @@
+{
+  "appid": "wxfabbce551235cdc9",
+  "compileType": "miniprogram",
+  "projectname": "expression-workshop",
+  "miniprogramRoot": "apps/miniprogram/dist/",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false
+  }
+}

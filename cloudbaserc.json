@@ -1,0 +1,32 @@
+{
+  "version": "2.0",
+  "envId": "cloud1-d2gffu9gv451fac14",
+  "functionRoot": "./cloudfunctions",
+  "functions": [
+    {
+      "name": "cleanup-expired",
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "installDependency": true,
+      "timeout": 60,
+      "memorySize": 256,
+      "triggers": [
+        {
+          "name": "hourly-cleanup",
+          "type": "timer",
+          "config": "0 0 * * * * *"
+        }
+      ]
+    },
+    {
+      "name": "work-api",
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "installDependency": true,
+      "timeout": 120
+    }
+  ],
+  "cloudrun": {
+    "name": "generator"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "cry",
+  "name": "爆哭",
+  "category": "emotion",
+  "durationMs": 2600,
+  "fps": 15,
+  "canvas": { "width": 480, "height": 480 },
+  "subject": {
+    "defaultX": 240,
+    "defaultY": 275,
+    "defaultScale": 1,
+    "minScale": 0.65,
+    "maxScale": 1.6
+  },
+  "layers": [
+    { "type": "background", "asset": "background.png" },
+    { "type": "subject" },
+    { "type": "animation", "asset": "foreground.webm" }
+  ]
+}

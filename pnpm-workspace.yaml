@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - cloudfunctions/*
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  '@tarojs/binding': true
+  '@tarojs/cli': true
+  core-js: set this to true or false
+  core-js-pure: set this to true or false
+  esbuild: true
+  protobufjs: set this to true or false

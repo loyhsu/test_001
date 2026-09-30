@@ -1,0 +1,20 @@
+{
+  "id": "slap",
+  "name": "打脸",
+  "category": "funny",
+  "durationMs": 1600,
+  "fps": 15,
+  "canvas": { "width": 480, "height": 480 },
+  "subject": {
+    "defaultX": 240,
+    "defaultY": 265,
+    "defaultScale": 1,
+    "minScale": 0.65,
+    "maxScale": 1.6
+  },
+  "layers": [
+    { "type": "background", "asset": "background.png" },
+    { "type": "subject" },
+    { "type": "animation", "asset": "foreground.webm" }
+  ]
+}

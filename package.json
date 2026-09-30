@@ -1,0 +1,17 @@
+{
+  "name": "expression-workshop",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "scripts": {
+    "build:weapp": "pnpm --dir apps/miniprogram build:weapp",
+    "dev:weapp": "pnpm --dir apps/miniprogram dev:weapp",
+    "test": "pnpm test:web && pnpm test:templates && pnpm test:generator",
+    "test:generator": "cd services/generator && uv run --python 3.11 pytest -q",
+    "test:templates": "node --test scripts/validate-templates.test.mjs",
+    "test:web": "pnpm --dir apps/miniprogram test"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://expression-workshop.local/template.schema.json",
+  "title": "Expression Workshop template",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "category",
+    "durationMs",
+    "fps",
+    "canvas",
+    "subject",
+    "layers"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "name": { "type": "string", "minLength": 1 },
+    "category": {
+      "enum": ["popular", "funny", "interaction", "emotion"]
+    },
+    "durationMs": { "type": "integer", "minimum": 1200, "maximum": 4000 },
+    "fps": { "type": "integer", "minimum": 10, "maximum": 20 },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "const": 480 },
+        "height": { "const": 480 }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "defaultX",
+        "defaultY",
+        "defaultScale",
+        "minScale",
+        "maxScale"
+      ],
+      "properties": {
+        "defaultX": { "type": "number", "minimum": 0, "maximum": 480 },
+        "defaultY": { "type": "number", "minimum": 0, "maximum": 480 },
+        "defaultScale": { "type": "number", "minimum": 0.65, "maximum": 1.6 },
+        "minScale": { "const": 0.65 },
+        "maxScale": { "const": 1.6 }
+      }
+    },
+    "layers": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type"],
+        "properties": {
+          "type": { "enum": ["background", "subject", "animation"] },
+          "asset": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

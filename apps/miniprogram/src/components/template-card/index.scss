@@ -1,0 +1,66 @@
+.template-card {
+  overflow: hidden;
+  border-radius: 24rpx;
+  background: #fff;
+}
+
+.template-card:active {
+  transform: scale(0.985);
+}
+
+.template-card__image {
+  display: block;
+  width: 100%;
+  background: #eaf3ff;
+}
+
+.template-card__caption {
+  display: flex;
+  flex-direction: column;
+  gap: 7rpx;
+  padding: 14rpx 14rpx 16rpx;
+}
+
+.template-card__name {
+  overflow: hidden;
+  color: #202c42;
+  font-size: 25rpx;
+  font-weight: 650;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-card__summary {
+  overflow: hidden;
+  color: #7c899e;
+  font-size: 21rpx;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-card--compact {
+  flex: 1;
+  min-width: 0;
+  border-radius: 22rpx;
+  background: #f0f5fd;
+}
+
+.template-card--compact .template-card__image {
+  height: 186rpx;
+}
+
+.template-card--compact .template-card__caption {
+  align-items: center;
+  padding: 14rpx 8rpx 18rpx;
+}
+
+.template-card--full {
+  border: 1rpx solid #edf1f7;
+  border-radius: 26rpx;
+}
+
+.template-card--full .template-card__image {
+  height: 218rpx;
+}

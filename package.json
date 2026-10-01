@@ -9,7 +9,8 @@
   "scripts": {
     "build:weapp": "pnpm --dir apps/miniprogram build:weapp",
     "dev:weapp": "pnpm --dir apps/miniprogram dev:weapp",
-    "test": "pnpm test:web && pnpm test:templates && pnpm test:generator",
+    "test": "pnpm test:web && pnpm test:templates && pnpm test:cloudfunctions && pnpm test:generator",
+    "test:cloudfunctions": "pnpm --dir cloudfunctions/work-api test && pnpm --dir cloudfunctions/cleanup-expired test",
     "test:generator": "cd services/generator && uv run --python 3.11 pytest -q",
     "test:templates": "node --test scripts/validate-templates.test.mjs",
     "test:web": "pnpm --dir apps/miniprogram test"

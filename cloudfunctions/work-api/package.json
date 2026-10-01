@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.js",
+  "scripts": {
+    "test": "node --test index.test.js src/*.test.js"
+  },
   "engines": {
     "node": ">=20.9"
   },

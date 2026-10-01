@@ -63,4 +63,6 @@ uv run --python 3.11 uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 在微信开发者工具及 iOS/Android 真机验证：选模板 → 上传 → 抠图 → 拖动/缩放 → 换背景/预览 → 生成 → 保存 → 我的作品。
 
-目前不能宣称已支持“一键加入微信表情”：相册保存、分享小程序卡片与加入微信表情是不同能力。跨账号作品分享与微信表情使用流程仍需独立验证；非摸头模板的真实素材及授权也需补齐。发布前按 `docs/release/mvp-checklist.md` 逐项取得证据。
+结果页已接入“发送表情到聊天”：下载 GIF 后，通过微信原生 `enterChatToolMode`（基础库 3.12.0 起）选择一个聊天，再调用 `shareEmojiToGroup`；若已处于聊天工具模式，则使用当前聊天。不支持时保留保存与使用指引，用户取消不自动发送或保存。发送时不附带私人作品页面入口。
+
+这条路径仍须在有接口权限的微信真机验收；H5 和开发者工具不能替代真实发送验证。参考[微信官方接口定义](https://github.com/wechat-miniprogram/api-typings/blob/master/types/wx/lib.wx.api.d.ts)。目前不能宣称已支持“一键加入微信表情”：相册保存、发送表情、分享小程序卡片与加入表情收藏是不同能力。跨账号作品分享、非摸头模板的真实素材及授权也需补齐。发布前按 `docs/release/mvp-checklist.md` 逐项取得证据。

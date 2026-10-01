@@ -1,5 +1,5 @@
 import { Button, Image, Text, View } from '@tarojs/components'
-import Taro, { useShareAppMessage } from '@tarojs/taro'
+import Taro, { useDidHide, useUnload, useShareAppMessage } from '@tarojs/taro'
 import { getSafeAreaTopPadding } from '../../platform/safe-area'
 import { useEffect, useRef, useState } from 'react'
 
@@ -7,6 +7,7 @@ import type { Work } from '../../domain/contracts'
 import { setPendingGeneration } from '../../features/editor/creation-store'
 import { TEMPLATE_ITEMS, getTemplateInfo } from '../../features/templates/template-data'
 import { saveWorkToAlbum, type AlbumPlatform } from '../../platform/album'
+import { createEmojiChatPlatform, sendWorkToChat, type NativeEmojiApi } from '../../platform/emoji-chat'
 import { createRequestId } from '../../platform/request-id'
 import { createWorkShareMetadata } from '../../platform/share'
 import { WorkApiError, workApi } from '../../services/work-api'
@@ -30,6 +31,20 @@ function albumPlatform(): AlbumPlatform {
   }
 }
 
+function emojiChatPlatform() {
+  const native = (globalThis as { wx?: NativeEmojiApi }).wx
+  return createEmojiChatPlatform(native, (url) => Taro.downloadFile({ url }))
+}
+
+function showWechatUsageGuide() {
+  return Taro.showModal({
+    title: '在微信中使用',
+    content: '优先点击“发送表情到聊天”，由微信选择聊天并发送动图。若当前微信不支持，可先保存到相册，再从微信表情面板的自定义表情添加入口尝试选择这张 GIF。发送或保存不会自动加入表情收藏，具体可用选项以你的微信版本为准。',
+    showCancel: false,
+    confirmText: '知道了',
+  })
+}
+
 export default function ResultPage() {
   const params = Taro.getCurrentInstance().router?.params ?? {}
   const workId = String(params.workId ?? '')
@@ -37,8 +52,28 @@ export default function ResultPage() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [inChatTool, setInChatTool] = useState(false)
   const [starting, setStarting] = useState(false)
+  const sendingRef = useRef(false)
   const active = useRef(false)
+  const sendOperation = useRef<{ cancelled: boolean; nativeFlow: boolean }>()
+
+  const cancelSend = () => {
+    if (sendOperation.current) sendOperation.current.cancelled = true
+  }
+  useDidHide(() => {
+    // The native chat selector may itself hide this page; only cancel background downloads.
+    if (!sendOperation.current?.nativeFlow) cancelSend()
+  })
+  useUnload(() => {
+    active.current = false
+    cancelSend()
+  })
+  const goBack = () => {
+    cancelSend()
+    void Taro.navigateBack()
+  }
 
   const template = getTemplateInfo(work?.templateId)
 
@@ -48,6 +83,9 @@ export default function ResultPage() {
 
   useEffect(() => {
     active.current = true
+    void emojiChatPlatform().getApiCategory().then((category) => {
+      if (active.current) setInChatTool(category === 'chatTool')
+    }).catch(() => {})
     let timer: ReturnType<typeof setTimeout> | undefined
     const load = async () => {
       if (!workId) {
@@ -81,12 +119,13 @@ export default function ResultPage() {
     void load()
     return () => {
       active.current = false
+      cancelSend()
       if (timer) clearTimeout(timer)
     }
   }, [workId])
 
   const saveToAlbum = async () => {
-    if (!work || saving) return
+    if (!work || saving || sendingRef.current) return
     setSaving(true)
     const result = await saveWorkToAlbum(work, albumPlatform())
     setSaving(false)
@@ -111,6 +150,52 @@ export default function ResultPage() {
     })
   }
 
+  const sendToChat = async () => {
+    if (!work || !active.current || saving || sendingRef.current) return
+    sendingRef.current = true
+    setSending(true)
+    const operation = { cancelled: false, nativeFlow: false }
+    sendOperation.current = operation
+    const platform = emojiChatPlatform()
+    try {
+      const result = await sendWorkToChat(work, platform, {
+        isActive: () => active.current && !operation.cancelled,
+        onNativeFlow: () => { operation.nativeFlow = true },
+      })
+      if (!active.current || operation.cancelled || (!result.ok && result.reason === 'cancelled')) return
+      if (result.ok) {
+        Taro.showToast({ title: '请到聊天中查看表情', icon: 'none' })
+        return
+      }
+      if (result.reason === 'unsupported' || result.reason === 'send-failed') {
+        const modal = await Taro.showModal({
+          title: result.reason === 'unsupported' ? '当前环境不支持直接发送' : '微信暂时未完成发送',
+          content: '可能与微信版本、接口权限或当前聊天场景有关。可以重试，或保存到相册后按使用指引操作。',
+          confirmText: '使用指引',
+          cancelText: '稍后再试',
+        })
+        if (modal.confirm && active.current && !operation.cancelled) await showWechatUsageGuide()
+        return
+      }
+      Taro.showToast({
+        title: result.reason === 'download-failed' ? '动图下载失败，请重新打开作品后再试' : '作品暂时不能发送',
+        icon: 'none',
+      })
+    } catch {
+      if (active.current && !operation.cancelled) Taro.showToast({ title: '暂时无法打开微信使用指引', icon: 'none' })
+    } finally {
+      operation.nativeFlow = false
+      sendingRef.current = false
+      if (active.current) {
+        setSending(false)
+        try {
+          const category = await platform.getApiCategory()
+          if (active.current && !operation.cancelled) setInChatTool(category === 'chatTool')
+        } catch { /* Leave the current UI mode unchanged if WeChat cannot report it. */ }
+      }
+    }
+  }
+
   const makeAnother = async (templateId: string) => {
     if (!work || starting || work.status === 'expired') return
     setStarting(true)
@@ -126,6 +211,7 @@ export default function ResultPage() {
         workId: work.id,
         nextTemplateId: templateId,
       })
+      cancelSend()
       await Taro.navigateTo({ url: '/pages/processing/index' })
       setStarting(false)
     } catch {
@@ -146,7 +232,7 @@ export default function ResultPage() {
       style={{ paddingTop: getSafeAreaTopPadding(Taro.getSystemInfoSync().statusBarHeight) }}
     >
       <View className="page-topbar">
-        <Text className="page-topbar__back" onClick={() => Taro.navigateBack()}>返回</Text>
+        <Text className="page-topbar__back" onClick={goBack}>返回</Text>
         <Text className="page-topbar__title">作品详情</Text>
         <View className="page-topbar__spacer" />
       </View>
@@ -157,7 +243,7 @@ export default function ResultPage() {
         <View className="result-message">
           <Text className="result-message__title">暂时打不开</Text>
           <Text className="result-message__copy">{loadError}</Text>
-          <Button className="subtle-button result-message__button" onClick={() => Taro.navigateBack()}>返回</Button>
+          <Button className="subtle-button result-message__button" onClick={goBack}>返回</Button>
         </View>
       ) : work?.status === 'ready' ? (
         <>
@@ -175,10 +261,13 @@ export default function ResultPage() {
           {loadError && <Text className="result-inline-note">{loadError}</Text>}
 
           <View className="result-actions">
-            <Button className="primary-button" disabled={!isReady || saving} onClick={saveToAlbum}>
+            <Button className="primary-button" disabled={!isReady || sending || saving} onClick={sendToChat}>
+              {sending ? '正在准备发送…' : '发送表情到聊天'}
+            </Button>
+            <Button className="subtle-button" disabled={!isReady || saving || sending} onClick={saveToAlbum}>
               {saving ? '正在保存…' : '保存到手机相册'}
             </Button>
-            <Button
+            {!inChatTool && <Button
               className="subtle-button result-share"
               openType="share"
               onClick={() => {
@@ -187,8 +276,11 @@ export default function ResultPage() {
                   templateId: work.templateId,
                 })
               }}
-            >分享给朋友</Button>
+            >分享作品卡片（不是表情）</Button>}
+            <Text className="result-usage-link" onClick={() => void showWechatUsageGuide()}>如何在微信中使用？</Text>
           </View>
+
+          <Text className="result-inline-note">直接发送需微信客户端支持；不会自动加入收藏表情。</Text>
 
           <View className="result-retention">
             <Text>作品将在 {new Date(work.expiresAt).toLocaleDateString()} 后过期</Text>
